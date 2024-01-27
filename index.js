@@ -29,11 +29,22 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
     // Collection's
     const productsCollection = client.db("Electron").collection("Products");
-    const testimonialsCollection = client.db("Electron").collection("testimonials");
+    const testimonialsCollection = client
+      .db("Electron")
+      .collection("testimonials");
     const blogPostsCollection = client.db("Electron").collection("blogPosts");
     const userCollection = client.db("Electron").collection("users");
+    const featuredCategoriesCollection = client
+      .db("Electron")
+      .collection("featuredCategories");
+    const specialOffersCollection = client
+      .db("Electron")
+      .collection("specialOffers");
+    const newsLetterCollection = client.db("Electron").collection("newsLetter");
+    const featuredBrandsCollection = client.db("Electron").collection("featuredBrands");
 
     // API's
     // User Related
@@ -44,27 +55,26 @@ async function run() {
         // If email is provided, find a specific user by email
         const query = { email };
         const result = await userCollection.findOne(query);
-        res.send(result);
+        return res.send(result);
       } else {
         // If email is not provided, find all users
         const result = await userCollection.find().toArray();
-        res.send(result);
+        return res.send(result);
       }
     });
-    // check if the user is admin
-    app.get("/users/admin/:email", async (req, res) => {
-      const email = req.params.email;
-      if (email !== req.decoded.email) {
-        return res.status(403).send({ message: "Forbidden Access" });
-      }
-      const query = { email: email };
-      const user = await userCollection.findOne(query);
-      let admin = false;
-      if (user) {
-        admin = user?.role === "admin";
-      }
-      res.send({ admin });
-    });
+    // // check if the user is admin
+    // app.get("/users/admin/:email", async (req, res) => {
+    //   const email = req.params.email;
+    //   if (email !== req.decoded.email) {
+    //     return res.status(403).send({ message: "Forbidden Access" });
+    //   }
+
+    //   const query = { email };
+    //   const user = await userCollection.findOne(query);
+    //   const admin = user?.role === "admin";
+
+    //   res.send({ admin });
+    // });
     // Post new user
     app.post("/users", async (req, res) => {
       const request = req.body;
@@ -79,8 +89,8 @@ async function run() {
       res.send(result);
     });
 
-
     // Products API
+    // view all products
     app.get("/products", async (req, res) => {
       // Get query parameters from the request
       const { arrival, bestSeller, brand, productType, name } = req.query;
@@ -101,22 +111,52 @@ async function run() {
     });
 
     // testimonials API
+    // view all testimonials
     app.get("/testimonials", async (req, res) => {
       const result = await testimonialsCollection.find().toArray();
       res.send(result);
     });
 
     // blogPosts API
+    // view all blogPosts
     app.get("/blogPosts", async (req, res) => {
       const result = await blogPostsCollection.find().toArray();
       res.send(result);
     });
 
+    // featuredCategories API
+    // view all featuredCategories
+    app.get("/featuredCategories", async (req, res) => {
+      const result = await featuredCategoriesCollection.find().toArray();
+      res.send(result);
+    });
 
+    // specialOffers API
+    // view all specialOffers
+    app.get("/specialOffers", async (req, res) => {
+      const result = await specialOffersCollection.find().toArray();
+      res.send(result);
+    });
 
+    // newsLetter API
+    // view all newsLetter
+    app.get("/newsLetter", async (req, res) => {
+      const result = await newsLetterCollection.find().toArray();
+      res.send(result);
+    });
+    // Post new newsLetter
+    app.post("/newsLetter", async (req, res) => {
+      const request = req.body;
+      const result = await newsLetterCollection.insertOne(request);
+      res.send(result);
+    });
 
-
-
+    // featuredBrands API
+    // view all featuredBrands
+    app.get("/featuredBrands", async (req, res) => {
+      const result = await featuredBrandsCollection.find().toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
