@@ -162,6 +162,29 @@ async function run() {
       const result = await specialOffersCollection.find().toArray();
       res.send(result);
     });
+    // Post new specialOffers
+    app.post("/specialOffers", async (req, res) => {
+      const request = req.body;
+      const result = await specialOffersCollection.insertOne(request);
+      res.send(result);
+    });
+    // delete specialOffers
+    app.delete("/specialOffers/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await specialOffersCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Update specialOffers
+    app.put("/specialOffers/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedOffer = req.body;
+      const result = await specialOffersCollection.updateOne(query, {
+        $set: updatedOffer,
+      });
+      res.send(result)
+    });
 
     // newsLetter API
     // view all newsLetter
