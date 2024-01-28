@@ -118,11 +118,25 @@ async function run() {
       const result = await testimonialsCollection.find().toArray();
       res.send(result);
     });
+    // delete testimonials
+    app.delete("/testimonials/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await testimonialsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // blogPosts API
     // view all blogPosts
     app.get("/blogPosts", async (req, res) => {
       const result = await blogPostsCollection.find().toArray();
+      res.send(result);
+    });
+    // delete blogPosts
+    app.delete("/blogPosts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await blogPostsCollection.deleteOne(query);
       res.send(result);
     });
 
@@ -153,7 +167,7 @@ async function run() {
       const result = await featuredCategoriesCollection.updateOne(query, {
         $set: updatedCategory,
       });
-      res.send(result)
+      res.send(result);
     });
 
     // specialOffers API
@@ -183,7 +197,7 @@ async function run() {
       const result = await specialOffersCollection.updateOne(query, {
         $set: updatedOffer,
       });
-      res.send(result)
+      res.send(result);
     });
 
     // newsLetter API
