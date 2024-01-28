@@ -44,7 +44,9 @@ async function run() {
       .db("Electron")
       .collection("specialOffers");
     const newsLetterCollection = client.db("Electron").collection("newsLetter");
-    const featuredBrandsCollection = client.db("Electron").collection("featuredBrands");
+    const featuredBrandsCollection = client
+      .db("Electron")
+      .collection("featuredBrands");
 
     // API's
     // User Related
@@ -129,6 +131,29 @@ async function run() {
     app.get("/featuredCategories", async (req, res) => {
       const result = await featuredCategoriesCollection.find().toArray();
       res.send(result);
+    });
+    // Post new featuredCategories
+    app.post("/featuredCategories", async (req, res) => {
+      const request = req.body;
+      const result = await featuredCategoriesCollection.insertOne(request);
+      res.send(result);
+    });
+    // delete featuredCategories
+    app.delete("/featuredCategories/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await featuredCategoriesCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Update featuredCategories
+    app.put("/featuredCategories/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedCategory = req.body;
+      const result = await featuredCategoriesCollection.updateOne(query, {
+        $set: updatedCategory,
+      });
+      res.send(result)
     });
 
     // specialOffers API
