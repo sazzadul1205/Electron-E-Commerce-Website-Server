@@ -132,6 +132,12 @@ async function run() {
       const result = await blogPostsCollection.find().toArray();
       res.send(result);
     });
+    // Post new blogPosts
+    app.post("/blogPosts", async (req, res) => {
+      const request = req.body;
+      const result = await blogPostsCollection.insertOne(request);
+      res.send(result);
+    });
     // delete blogPosts
     app.delete("/blogPosts/:id", async (req, res) => {
       const id = req.params.id;
@@ -217,6 +223,19 @@ async function run() {
     // view all featuredBrands
     app.get("/featuredBrands", async (req, res) => {
       const result = await featuredBrandsCollection.find().toArray();
+      res.send(result);
+    });
+    // delete featuredBrands
+    app.delete("/featuredBrands/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await featuredBrandsCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Post new featuredBrands
+    app.post("/featuredBrands", async (req, res) => {
+      const request = req.body;
+      const result = await featuredBrandsCollection.insertOne(request);
       res.send(result);
     });
 
