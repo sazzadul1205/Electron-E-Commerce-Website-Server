@@ -92,23 +92,58 @@ async function run() {
     });
 
     // Products API
-    // view all products
+    // view all products with pagination
     app.get("/products", async (req, res) => {
-      // Get query parameters from the request
-      const { arrival, bestSeller, brand, productType, name } = req.query;
+      const { arrival, bestSeller, brand, productType, name, page, size } =
+        req.query;
 
-      // Create a filter object based on provided parameters
       const filter = {};
       if (arrival) filter.arrival = arrival;
       if (bestSeller) filter.bestSeller = bestSeller === "true"; // Convert string to boolean
       if (brand) filter.brand = brand;
-      if (productType) filter.productType = productType;
+      if (productType) filter.productType = productType; // Add productType filter
       if (name) filter.name = new RegExp(name, "i"); // Case-insensitive name search
 
-      // Query the database with the filter
-      const result = await productsCollection.find(filter).toArray();
+      const skip = page
+        ? (parseInt(page) - 1) * (size ? parseInt(size) : 10)
+        : 0;
+      const limit = size ? parseInt(size) : 10;
+
+      const result = await productsCollection
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .toArray();
 
       // Send the result as the response
+      res.send(result);
+    });
+    // count of all products
+    app.get("/productsCount", async (req, res) => {
+      const count = await productsCollection.countDocuments();
+      res.json({ count });
+    });
+    // Post new products
+    app.post("/products", async (req, res) => {
+      const request = req.body;
+      const result = await productsCollection.insertOne(request);
+      res.send(result);
+    });
+    // delete products
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Update products
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedProduct = req.body;
+      const result = await productsCollection.updateOne(query, {
+        $set: updatedProduct,
+      });
       res.send(result);
     });
 
