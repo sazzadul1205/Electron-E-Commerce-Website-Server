@@ -47,6 +47,7 @@ async function run() {
     const featuredBrandsCollection = client
       .db("Electron")
       .collection("featuredBrands");
+    const PublicCartCollection = client.db("Electron").collection("PublicCart");
 
     // API's
     // User Related
@@ -271,6 +272,34 @@ async function run() {
     app.post("/featuredBrands", async (req, res) => {
       const request = req.body;
       const result = await featuredBrandsCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // PublicCart API
+    // view all PublicCart
+    app.get("/PublicCart", async (req, res) => {
+      const { email } = req.query;
+      if (email) {
+        // If email is provided, find a specific user by email
+        const query = { email };
+        const result = await userCollection.find(query).toArray();
+        return res.send(result);
+      } else {
+        const result = await PublicCartCollection.find().toArray();
+        res.send(result);
+      }
+    });
+    // delete PublicCart
+    app.delete("/PublicCart/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await PublicCartCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Post new PublicCart
+    app.post("/PublicCart", async (req, res) => {
+      const request = req.body;
+      const result = await PublicCartCollection.insertOne(request);
       res.send(result);
     });
 
