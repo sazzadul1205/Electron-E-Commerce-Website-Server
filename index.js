@@ -278,11 +278,11 @@ async function run() {
     // PublicCart API
     // view all PublicCart
     app.get("/PublicCart", async (req, res) => {
-      const { email } = req.query;
-      if (email) {
+      const { buyer } = req.query;
+      if (buyer) {
         // If email is provided, find a specific user by email
-        const query = { email };
-        const result = await userCollection.find(query).toArray();
+        const query = { buyer };
+        const result = await PublicCartCollection.find(query).toArray();
         return res.send(result);
       } else {
         const result = await PublicCartCollection.find().toArray();
