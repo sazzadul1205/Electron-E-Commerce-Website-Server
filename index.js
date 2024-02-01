@@ -48,6 +48,9 @@ async function run() {
       .db("Electron")
       .collection("featuredBrands");
     const PublicCartCollection = client.db("Electron").collection("PublicCart");
+    const OrderHistoryCollection = client
+      .db("Electron")
+      .collection("OrderHistory");
 
     // API's
     // User Related
@@ -300,6 +303,62 @@ async function run() {
     app.post("/PublicCart", async (req, res) => {
       const request = req.body;
       const result = await PublicCartCollection.insertOne(request);
+      res.send(result);
+    });
+    // delete multiple PublicCart items
+    app.post("/PublicCart/delete-multiple", async (req, res) => {
+      const { items } = req.body;
+      const query = { _id: { $in: items.map((id) => new ObjectId(id)) } };
+      const result = await PublicCartCollection.deleteMany(query);
+      res.send(result);
+    });
+
+    // OrderHistory API
+    // view all OrderHistory
+    app.get("/OrderHistory", async (req, res) => {
+      const { email, orderState } = req.query;
+
+      let query = {};
+
+      // Check if email is provided and add it to the query
+      if (email) {
+        query.email = email;
+      }
+
+      // Check if orderState is provided and add it to the query
+      if (orderState) {
+        query.orderState = orderState;
+      }
+
+      try {
+        const result = await OrderHistoryCollection.find(query).toArray();
+        return res.send(result);
+      } catch (error) {
+        console.error("Error fetching order history:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+    });
+    // delete OrderHistory
+    app.delete("/OrderHistory/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await OrderHistoryCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Post new OrderHistory
+    app.post("/OrderHistory", async (req, res) => {
+      const request = req.body;
+      const result = await OrderHistoryCollection.insertOne(request);
+      res.send(result);
+    });
+    // Update OrderHistory
+    app.put("/OrderHistory/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedOffer = req.body;
+      const result = await OrderHistoryCollection.updateOne(query, {
+        $set: updatedOffer,
+      });
       res.send(result);
     });
 
