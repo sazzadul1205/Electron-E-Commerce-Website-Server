@@ -51,6 +51,7 @@ async function run() {
     const OrderHistoryCollection = client
       .db("Electron")
       .collection("OrderHistory");
+    const FAQsCollection = client.db("Electron").collection("FAQs");
 
     // API's
     // User Related
@@ -169,6 +170,13 @@ async function run() {
     // view all blogPosts
     app.get("/blogPosts", async (req, res) => {
       const result = await blogPostsCollection.find().toArray();
+      res.send(result);
+    });
+    // view an indivisual blogPosts
+    app.get("/blogPosts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await blogPostsCollection.findOne(query);
       res.send(result);
     });
     // Post new blogPosts
@@ -357,6 +365,36 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const updatedOffer = req.body;
       const result = await OrderHistoryCollection.updateOne(query, {
+        $set: updatedOffer,
+      });
+      res.send(result);
+    });
+
+    // FAQs API
+    // view all FAQs
+    app.get("/FAQs", async (req, res) => {
+      const result = await FAQsCollection.find().toArray();
+      return res.send(result);
+    });
+    // delete FAQs
+    app.delete("/FAQs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await FAQsCollection.deleteOne(query);
+      res.send(result);
+    });
+    // Post new FAQs
+    app.post("/FAQs", async (req, res) => {
+      const request = req.body;
+      const result = await FAQsCollection.insertOne(request);
+      res.send(result);
+    });
+    // Update FAQs
+    app.put("/FAQs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedOffer = req.body;
+      const result = await FAQsCollection.updateOne(query, {
         $set: updatedOffer,
       });
       res.send(result);
