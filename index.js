@@ -169,10 +169,18 @@ async function run() {
     // blogPosts API
     // view all blogPosts
     app.get("/blogPosts", async (req, res) => {
-      const result = await blogPostsCollection.find().toArray();
-      res.send(result);
+      const { postedBy } = req.query;
+      if (postedBy) {
+        // If email is provided, find a specific user by email
+        const query = { postedBy };
+        const result = await blogPostsCollection.find(query).toArray();
+        return res.send(result);
+      } else {
+        const result = await blogPostsCollection.find().toArray();
+        res.send(result);
+      }
     });
-    // view an indivisual blogPosts
+    // view a blogPosts
     app.get("/blogPosts/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
