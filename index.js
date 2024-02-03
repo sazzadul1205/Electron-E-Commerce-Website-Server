@@ -8,7 +8,11 @@ const port = process.env.PORT || 5000;
 // Middle Ware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://electon-ecommerce-cd299.web.app",
+      "https://electon-ecommerce-cd299.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
